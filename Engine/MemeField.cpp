@@ -24,6 +24,19 @@ MemeField::MemeField(int nMemes)
 
 		TileAt(spawnPos).SpawnMeme();
 	}
+
+	//Testing random spots for memes
+	for (int i = 0; i < 120; i++)
+	{
+		Vei2 testPos;
+
+		do
+		{
+			testPos = { xDist(rng), yDist(rng) };
+		} while (TileAt(testPos).IsRevealed());
+
+		TileAt(testPos).Reveal();
+	}
 }
 
 void MemeField::Draw(Graphics& gfx) const
@@ -89,7 +102,7 @@ void MemeField::Tile::Draw(const Vei2& gridPos, Graphics& gfx) const
 			//Check if tile has meme
 			if (hasMeme)
 			{
-				SpriteCodex::DrawTile1(screenPos, gfx);
+				SpriteCodex::DrawTileBomb(screenPos, gfx);
 				break;
 			}
 			else
@@ -99,4 +112,19 @@ void MemeField::Tile::Draw(const Vei2& gridPos, Graphics& gfx) const
 			}
 		}
 	}
+}
+
+void MemeField::Tile::Reveal()
+{
+	assert(!IsRevealed());
+
+	state = State::Revealed;
+}
+
+bool MemeField::Tile::IsRevealed() const
+{
+	if (state == State::Revealed)
+		return true;
+	else
+		return false;
 }

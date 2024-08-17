@@ -17,6 +17,8 @@ class MemeField
 		bool HasMeme() const;
 		void SpawnMeme();
 		void Draw(const Vei2& gridPos, Graphics& gfx) const;
+		void Reveal();
+		bool IsRevealed() const;
 	private:
 		bool hasMeme = false;
 		State state = State::Hidden;
