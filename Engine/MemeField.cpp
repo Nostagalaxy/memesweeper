@@ -24,19 +24,6 @@ MemeField::MemeField(int nMemes)
 
 		TileAt(spawnPos).SpawnMeme();
 	}
-
-	//Testing random spots for memes
-	for (int i = 0; i < 120; i++)
-	{
-		Vei2 testPos;
-
-		do
-		{
-			testPos = { xDist(rng), yDist(rng) };
-		} while (TileAt(testPos).IsRevealed());
-
-		TileAt(testPos).Reveal();
-	}
 }
 
 void MemeField::Draw(Graphics& gfx) const
