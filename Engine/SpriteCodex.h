@@ -27,4 +27,5 @@ public:
 	static void DrawTileBombRed( const Vei2& pos,Graphics& gfx );
 	//Selects number tile based on nMemes
 	static void DrawNumberTile(const Vei2& screenPos, const int nMemes, Graphics& gfx);
+	static void DrawWin(const Vei2& pos, Graphics& gfx);
 };

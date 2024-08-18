@@ -25,7 +25,7 @@ Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
 	gfx( wnd ),
-	field(3)
+	field(1)
 {
 }
 
@@ -39,7 +39,7 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
-	if (!field.Fucked() || !field.GameWon())
+	if (!field.Fucked() && !field.GameWon())
 	{
 		while (!wnd.mouse.IsEmpty())
 		{

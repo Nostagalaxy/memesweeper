@@ -47,9 +47,7 @@ private:
 	Vei2 gameOverLoc = { -1, -1 };
 	bool isFucked = false;
 	bool gameWon = false;
-	int memesFound = 0;
-	int nMemesInGame = 0;
-
+	int nonMemeTilesLeft;
 	static constexpr int width = 6;
 	static constexpr int height = 3;
 	Tile field[width * height];

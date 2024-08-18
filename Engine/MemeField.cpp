@@ -7,7 +7,8 @@
 
 MemeField::MemeField(int nMemes)
 {
-	nMemesInGame = nMemes;
+	//Available tiles to click for game won state to happen
+	nonMemeTilesLeft = (height * width) - nMemes;
 
 	//Set location in center of screen
 	Vei2 center = {Graphics::ScreenWidth / 2 , Graphics::ScreenHeight / 2};
@@ -60,6 +61,11 @@ void MemeField::Draw(Graphics& gfx) const
 			TileAt(gridPos).Draw( screenPos, isFucked, gfx );
 		}
 	}
+
+	if (gameWon)
+	{
+		SpriteCodex::DrawWin(location, gfx);
+	}
 }
 
 void MemeField::OnClickReveal(Vei2 screenPos)
@@ -71,12 +77,25 @@ void MemeField::OnClickReveal(Vei2 screenPos)
 
 	Vei2 gridPos = ScreenToGrid(screenPos);
 
-	if(!TileAt(gridPos).IsRevealed())
-		TileAt(gridPos).Reveal();
-	if (TileAt(gridPos).HasMeme())
+	//Only reveal if the tile is not flagged and note revealed already
+	if (!TileAt(gridPos).IsRevealed() && !TileAt(gridPos).IsFlagged())
 	{
-		isFucked = true;
-		gameOverLoc = gridPos;
+		TileAt(gridPos).Reveal();
+		
+		if (TileAt(gridPos).HasMeme())
+		{
+			isFucked = true;
+			gameOverLoc = gridPos;
+		}
+		else if (!TileAt(gridPos).HasMeme())
+		{
+			nonMemeTilesLeft--;
+
+			if (nonMemeTilesLeft <= 0)
+			{
+				gameWon = true;
+			}
+		}
 	}
 }
 
@@ -230,6 +249,7 @@ void MemeField::Tile::Draw(const Vei2& screenPos, bool gameOver, Graphics& gfx) 
 		{
 			if (!hasMeme)
 			{
+				SpriteCodex::DrawTile0(screenPos, gfx);
 				SpriteCodex::DrawTileCross(screenPos, gfx);
 				break;
 			}
