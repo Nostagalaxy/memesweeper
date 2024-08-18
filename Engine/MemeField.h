@@ -1,6 +1,7 @@
 #pragma once
 #include "Graphics.h"
 #include "RectI.h"
+#include "Sound.h"
 
 class MemeField
 {
@@ -43,6 +44,7 @@ private:
 	Vei2& ScreenToGrid(Vei2& screenPos) const;
 	Vei2& GridToScreen(Vei2& gridPos) const;
 private:
+	Sound gameOverSfx;
 	Vei2 location;
 	Vei2 gameOverLoc = { -1, -1 };
 	bool isFucked = false;

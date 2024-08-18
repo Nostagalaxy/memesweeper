@@ -6,10 +6,10 @@
 
 
 MemeField::MemeField(int nMemes)
+	:
+	gameOverSfx(L"Engine_spayed.wav"),
+	nonMemeTilesLeft((height * width) - nMemes)
 {
-	//Available tiles to click for game won state to happen
-	nonMemeTilesLeft = (height * width) - nMemes;
-
 	//Set location in center of screen
 	Vei2 center = {Graphics::ScreenWidth / 2 , Graphics::ScreenHeight / 2};
 	Vei2 toStartLoc = { (width * SpriteCodex::tileSize) / 2 , (height * SpriteCodex::tileSize) / 2};
@@ -44,6 +44,8 @@ MemeField::MemeField(int nMemes)
 			TileAt(gridPos).SetNeighborMemeCount(CountNeighborMemes(gridPos));
 		}
 	}
+
+	;
 }
 
 void MemeField::Draw(Graphics& gfx) const
@@ -86,6 +88,7 @@ void MemeField::OnClickReveal(Vei2 screenPos)
 		{
 			isFucked = true;
 			gameOverLoc = gridPos;
+			gameOverSfx.Play();
 		}
 		else if (!TileAt(gridPos).HasMeme())
 		{
