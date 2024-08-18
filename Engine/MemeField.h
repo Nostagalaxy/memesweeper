@@ -19,6 +19,8 @@ class MemeField
 		void Draw(const Vei2& gridPos, Graphics& gfx) const;
 		void Reveal();
 		bool IsRevealed() const;
+		void ToggleFlag();
+		bool IsFlagged();
 	private:
 		bool hasMeme = false;
 		State state = State::Hidden;
@@ -27,6 +29,7 @@ public:
 	MemeField(int nMemes);
 	void Draw(Graphics& gfx) const;
 	void OnClickReveal(Vei2 screenPos);
+	void OnClickFlag(Vei2 screenPos);
 	RectI& GetRect() const;
 private:
 	Tile& TileAt(const Vei2& gridPos);
