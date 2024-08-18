@@ -50,7 +50,7 @@ private:
 	bool isFucked = false;
 	bool gameWon = false;
 	int nonMemeTilesLeft;
-	static constexpr int width = 6;
-	static constexpr int height = 3;
+	static constexpr int width = 20;
+	static constexpr int height = 16;
 	Tile field[width * height];
 };
