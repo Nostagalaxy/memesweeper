@@ -24,6 +24,17 @@ MemeField::MemeField(int nMemes)
 
 		TileAt(spawnPos).SpawnMeme();
 	}
+
+	//Count nMemes for each tile
+	for (int y = 0; y < height; y++)
+	{
+		for (int x = 0; x < width; x++)
+		{
+			const Vei2 gridPos(x, y);
+
+			TileAt(gridPos).SetNeighborMemeCount(CountNeighborMemes(gridPos));
+		}
+	}
 }
 
 void MemeField::Draw(Graphics& gfx) const
@@ -36,7 +47,7 @@ void MemeField::Draw(Graphics& gfx) const
 	{
 		for (gridPos.x = 0; gridPos.x < width; gridPos.x++)
 		{
-			TileAt(gridPos).Draw( gridPos, gfx );
+			TileAt(gridPos).Draw( gridPos, isFucked, gfx );
 		}
 	}
 }
@@ -50,6 +61,11 @@ void MemeField::OnClickReveal(Vei2 screenPos)
 
 	if(!TileAt(gridPos).IsRevealed())
 		TileAt(gridPos).Reveal();
+	if (TileAt(gridPos).HasMeme())
+	{
+		isFucked = true;
+		gameOverLoc = gridPos;
+	}
 }
 
 void MemeField::OnClickFlag(Vei2 screenPos)
@@ -86,6 +102,37 @@ RectI& MemeField::GetRect() const
 	return rect;
 }
 
+int MemeField::CountNeighborMemes(const Vei2& gridPos)
+{
+	//Set boundaries of start and stop position
+	//Start is x-1, y-1 and end is x + 1, y + 1, unless tile is near the edge of grid (use std::min and std::max)
+	const int xStart = std::max(gridPos.x - 1, 0);
+	const int yStart = std::max(gridPos.y - 1, 0);
+	const int xEnd = std::min(gridPos.x + 1, width - 1);
+	const int yEnd = std::min(gridPos.y + 1, height - 1);
+
+	int memeCount = 0;
+
+	//loop
+	for (int y = yStart; y <= yEnd; y++)
+	{
+		for (int x = xStart; x <= xEnd; x++)
+		{
+			const Vei2 gridPos(x, y);
+			if (TileAt(gridPos).HasMeme())
+			{
+				memeCount++;
+			}
+		}
+	}
+	return memeCount;
+}
+
+bool MemeField::Fucked()
+{
+	return isFucked;
+}
+
 bool MemeField::Tile::HasMeme() const
 {
 	return hasMeme;
@@ -97,12 +144,22 @@ void MemeField::Tile::SpawnMeme()
 	hasMeme = true;
 }
 
-void MemeField::Tile::Draw(const Vei2& gridPos, Graphics& gfx) const
+void MemeField::Tile::SetNeighborMemeCount(const int memeCount)
+{
+	//assert variable is uninitialized
+	assert(nNeighborMemes == -1);
+
+	nNeighborMemes = memeCount;
+}
+
+void MemeField::Tile::Draw(const Vei2& gridPos, bool gameOver, Graphics& gfx) const
 {
 	Vei2 screenPos = gridPos * SpriteCodex::tileSize;
 
-	switch (state)
+	if (!gameOver)
 	{
+		switch (state)
+		{
 		case State::Hidden:
 		{
 			SpriteCodex::DrawTileButton(screenPos, gfx);
@@ -124,9 +181,61 @@ void MemeField::Tile::Draw(const Vei2& gridPos, Graphics& gfx) const
 			}
 			else
 			{
-				SpriteCodex::DrawTile0(screenPos, gfx);
+				SpriteCodex::DrawNumberTile(screenPos, nNeighborMemes, gfx);
 				break;
 			}
+		}
+		}
+	}
+	else if (gameOver)
+	{
+		switch (state)
+		{
+		case State::Hidden:
+		{
+			if (hasMeme)
+			{
+				SpriteCodex::DrawTileBomb(screenPos, gfx);
+				break;
+			}
+			else
+			{
+				SpriteCodex::DrawTileButton(screenPos, gfx);
+				break;
+			}
+		}
+		case State::Flagged:
+		{
+			if (!hasMeme)
+			{
+				SpriteCodex::DrawTileCross(screenPos, gfx);
+				break;
+			}
+			else if(hasMeme)
+			{
+				SpriteCodex::DrawTileBomb(screenPos, gfx);
+				SpriteCodex::DrawTileFlag(screenPos, gfx);
+				break;
+			}
+		}
+		case State::Revealed:
+		{
+			//Check if tile has meme
+			if (hasMeme)
+			{
+				if (isGameOverLoc)
+				{
+					SpriteCodex::DrawTileBombRed(screenPos, gfx);
+				}
+				SpriteCodex::DrawTileBomb(screenPos, gfx);
+				break;
+			}
+			else
+			{
+				SpriteCodex::DrawNumberTile(screenPos, nNeighborMemes, gfx);
+				break;
+			}
+		}
 		}
 	}
 }
@@ -136,6 +245,11 @@ void MemeField::Tile::Reveal()
 	assert(!IsRevealed());
 
 	state = State::Revealed;
+
+	if (hasMeme)
+	{
+		isGameOverLoc = true;
+	}
 }
 
 bool MemeField::Tile::IsRevealed() const

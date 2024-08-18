@@ -25,4 +25,6 @@ public:
 	static void DrawTileFlag( const Vei2& pos,Graphics& gfx );
 	static void DrawTileBomb( const Vei2& pos,Graphics& gfx );
 	static void DrawTileBombRed( const Vei2& pos,Graphics& gfx );
+	//Selects number tile based on nMemes
+	static void DrawNumberTile(const Vei2& screenPos, const int nMemes, Graphics& gfx);
 };
