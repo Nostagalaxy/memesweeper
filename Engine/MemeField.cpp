@@ -44,8 +44,6 @@ MemeField::MemeField(int nMemes)
 			TileAt(gridPos).SetNeighborMemeCount(CountNeighborMemes(gridPos));
 		}
 	}
-
-	;
 }
 
 void MemeField::Draw(Graphics& gfx) const
@@ -60,11 +58,11 @@ void MemeField::Draw(Graphics& gfx) const
 		{
 			//Create tile location in screen space and pass to tile draw
 			Vei2 screenPos = GridToScreen(gridPos);
-			TileAt(gridPos).Draw( screenPos, isFucked, gfx );
+			TileAt(gridPos).Draw( screenPos, gameState, gfx );
 		}
 	}
 
-	if (gameWon)
+	if (gameState == State::Winrar)
 	{
 		SpriteCodex::DrawWin(location, gfx);
 	}
@@ -86,7 +84,7 @@ void MemeField::OnClickReveal(Vei2 screenPos)
 		
 		if (TileAt(gridPos).HasMeme())
 		{
-			isFucked = true;
+			gameState = State::Fucked;
 			gameOverLoc = gridPos;
 			gameOverSfx.Play();
 		}
@@ -96,7 +94,7 @@ void MemeField::OnClickReveal(Vei2 screenPos)
 
 			if (nonMemeTilesLeft <= 0)
 			{
-				gameWon = true;
+				gameState = State::Winrar;
 			}
 		}
 	}
@@ -171,12 +169,23 @@ int MemeField::CountNeighborMemes(const Vei2& gridPos)
 
 bool MemeField::Fucked() const
 {
-	return isFucked;
+	if (gameState == State::Fucked)
+		return true;
+	else
+		return false;
 }
 
 bool MemeField::GameWon() const
 {
-	return gameWon;
+	if (gameState == State::Winrar)
+		return true;
+	else
+		return false;
+}
+
+MemeField::State MemeField::getState() const
+{
+	return gameState;
 }
 
 bool MemeField::Tile::HasMeme() const
@@ -198,13 +207,13 @@ void MemeField::Tile::SetNeighborMemeCount(const int memeCount)
 	nNeighborMemes = memeCount;
 }
 
-void MemeField::Tile::Draw(const Vei2& screenPos, bool gameOver, Graphics& gfx) const
+void MemeField::Tile::Draw(const Vei2& screenPos, const MemeField::State gameState, Graphics& gfx) const
 {
-	if (!gameOver)
+	if (gameState == MemeField::State::Play)
 	{
 		switch (state)
 		{
-		case State::Hidden:
+		case Tile::State::Hidden:
 		{
 			SpriteCodex::DrawTileButton(screenPos, gfx);
 			break;
@@ -231,7 +240,7 @@ void MemeField::Tile::Draw(const Vei2& screenPos, bool gameOver, Graphics& gfx) 
 		}
 		}
 	}
-	else if (gameOver)
+	else if (gameState == MemeField::State::Fucked)
 	{
 		switch (state)
 		{

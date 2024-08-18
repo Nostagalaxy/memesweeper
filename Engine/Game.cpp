@@ -39,7 +39,7 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
-	if (!field.Fucked() && !field.GameWon())
+	if (!(field.Fucked()) && !(field.GameWon()))
 	{
 		while (!wnd.mouse.IsEmpty())
 		{

@@ -5,6 +5,13 @@
 
 class MemeField
 {
+	enum class State
+	{
+		Fucked,
+		Winrar,
+		Play
+	};
+
 	class Tile
 	{
 	public:
@@ -18,7 +25,7 @@ class MemeField
 		bool HasMeme() const;
 		void SpawnMeme();
 		void SetNeighborMemeCount(const int memeCount); //Set the number of neighboring memes for the tile.
-		void Draw(const Vei2& screenPos, const bool GameOver, Graphics& gfx) const;
+		void Draw(const Vei2& screenPos, const MemeField::State gameState, Graphics& gfx) const;
 		void Reveal();
 		bool IsRevealed() const;
 		void ToggleFlag();
@@ -38,17 +45,17 @@ public:
 	int CountNeighborMemes(const Vei2& gridPos); //Takes a tile location and counts how many memes are neighboring that tile
 	bool Fucked() const;
 	bool GameWon() const;
+	State getState() const;
 private:
 	Tile& TileAt(const Vei2& gridPos);
 	const Tile& TileAt(const Vei2& gridPos) const;
 	Vei2& ScreenToGrid(Vei2& screenPos) const;
 	Vei2& GridToScreen(Vei2& gridPos) const;
 private:
+	State gameState = State::Play;
 	Sound gameOverSfx;
 	Vei2 location;
 	Vei2 gameOverLoc = { -1, -1 };
-	bool isFucked = false;
-	bool gameWon = false;
 	int nonMemeTilesLeft;
 	static constexpr int width = 20;
 	static constexpr int height = 16;
