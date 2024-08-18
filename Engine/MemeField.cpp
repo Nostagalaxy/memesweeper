@@ -43,6 +43,9 @@ void MemeField::Draw(Graphics& gfx) const
 
 void MemeField::OnClickReveal(Vei2 screenPos)
 {
+	assert(screenPos.x >= 0 && screenPos.x < width * SpriteCodex::tileSize &&
+		screenPos.y >= 0 && screenPos.y < height * SpriteCodex::tileSize);
+
 	Vei2 gridPos = ScreenToGrid(screenPos);
 
 	if(!TileAt(gridPos).IsRevealed())
