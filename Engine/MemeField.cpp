@@ -4,8 +4,14 @@
 #include "Vei2.h"
 #include "SpriteCodex.h"
 
+
 MemeField::MemeField(int nMemes)
 {
+	//Set location in center of screen
+	Vei2 center = {Graphics::ScreenWidth / 2 , Graphics::ScreenHeight / 2};
+	Vei2 toStartLoc = { (width * SpriteCodex::tileSize) / 2 , (height * SpriteCodex::tileSize) / 2};
+	location = center - toStartLoc;
+
 	//Check to make sure number of memes parameter is reasonable
 	assert(nMemes > 0 && nMemes < width* height);
 	std::random_device rd;
@@ -47,15 +53,19 @@ void MemeField::Draw(Graphics& gfx) const
 	{
 		for (gridPos.x = 0; gridPos.x < width; gridPos.x++)
 		{
-			TileAt(gridPos).Draw( gridPos, isFucked, gfx );
+			//Create tile location in screen space and pass to tile draw
+			Vei2 screenPos = GridToScreen(gridPos);
+			TileAt(gridPos).Draw( screenPos, isFucked, gfx );
 		}
 	}
 }
 
 void MemeField::OnClickReveal(Vei2 screenPos)
 {
-	assert(screenPos.x >= 0 && screenPos.x < width * SpriteCodex::tileSize &&
-		screenPos.y >= 0 && screenPos.y < height * SpriteCodex::tileSize);
+	RectI gridRect = GetRect();
+
+	assert(screenPos.x >= gridRect.left && screenPos.x < gridRect.right &&
+		screenPos.y >= gridRect.top && screenPos.y < gridRect.bottom);
 
 	Vei2 gridPos = ScreenToGrid(screenPos);
 
@@ -93,12 +103,17 @@ const MemeField::Tile& MemeField::TileAt(const Vei2& gridPos) const
 
 Vei2& MemeField::ScreenToGrid(Vei2& screenPos) const
 {
-	return screenPos / SpriteCodex::tileSize;
+	return (screenPos - location) / SpriteCodex::tileSize;
+}
+
+Vei2& MemeField::GridToScreen(Vei2& gridPos) const
+{
+	return (gridPos * SpriteCodex::tileSize) + location;
 }
 
 RectI& MemeField::GetRect() const
 {
-	RectI rect = { 0, width * SpriteCodex::tileSize, 0, height * SpriteCodex::tileSize};
+	RectI rect = { location.x, (width * SpriteCodex::tileSize) + location.x, location.y, (height * SpriteCodex::tileSize) + location.y};
 	return rect;
 }
 
@@ -152,10 +167,8 @@ void MemeField::Tile::SetNeighborMemeCount(const int memeCount)
 	nNeighborMemes = memeCount;
 }
 
-void MemeField::Tile::Draw(const Vei2& gridPos, bool gameOver, Graphics& gfx) const
+void MemeField::Tile::Draw(const Vei2& screenPos, bool gameOver, Graphics& gfx) const
 {
-	Vei2 screenPos = gridPos * SpriteCodex::tileSize;
-
 	if (!gameOver)
 	{
 		switch (state)

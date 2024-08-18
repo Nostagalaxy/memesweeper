@@ -17,7 +17,7 @@ class MemeField
 		bool HasMeme() const;
 		void SpawnMeme();
 		void SetNeighborMemeCount(const int memeCount); //Set the number of neighboring memes for the tile.
-		void Draw(const Vei2& gridPos, const bool GameOver, Graphics& gfx) const;
+		void Draw(const Vei2& screenPos, const bool GameOver, Graphics& gfx) const;
 		void Reveal();
 		bool IsRevealed() const;
 		void ToggleFlag();
@@ -40,10 +40,12 @@ private:
 	Tile& TileAt(const Vei2& gridPos);
 	const Tile& TileAt(const Vei2& gridPos) const;
 	Vei2& ScreenToGrid(Vei2& screenPos) const;
+	Vei2& GridToScreen(Vei2& gridPos) const;
 private:
+	Vei2 location;
 	Vei2 gameOverLoc = { -1, -1 };
 	bool isFucked = false;
-	static constexpr int width = 20;
-	static constexpr int height = 16;
+	static constexpr int width = 6;
+	static constexpr int height = 3;
 	Tile field[width * height];
 };
