@@ -35,7 +35,8 @@ public:
 	void OnClickFlag(Vei2 screenPos);
 	RectI& GetRect() const;
 	int CountNeighborMemes(const Vei2& gridPos); //Takes a tile location and counts how many memes are neighboring that tile
-	bool Fucked();
+	bool Fucked() const;
+	bool GameWon() const;
 private:
 	Tile& TileAt(const Vei2& gridPos);
 	const Tile& TileAt(const Vei2& gridPos) const;
@@ -45,6 +46,10 @@ private:
 	Vei2 location;
 	Vei2 gameOverLoc = { -1, -1 };
 	bool isFucked = false;
+	bool gameWon = false;
+	int memesFound = 0;
+	int nMemesInGame = 0;
+
 	static constexpr int width = 6;
 	static constexpr int height = 3;
 	Tile field[width * height];

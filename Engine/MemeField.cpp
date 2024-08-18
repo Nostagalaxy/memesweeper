@@ -7,6 +7,8 @@
 
 MemeField::MemeField(int nMemes)
 {
+	nMemesInGame = nMemes;
+
 	//Set location in center of screen
 	Vei2 center = {Graphics::ScreenWidth / 2 , Graphics::ScreenHeight / 2};
 	Vei2 toStartLoc = { (width * SpriteCodex::tileSize) / 2 , (height * SpriteCodex::tileSize) / 2};
@@ -80,8 +82,10 @@ void MemeField::OnClickReveal(Vei2 screenPos)
 
 void MemeField::OnClickFlag(Vei2 screenPos)
 {
-	assert(screenPos.x >= 0 && screenPos.x < width * SpriteCodex::tileSize &&
-		screenPos.y >= 0 && screenPos.y < height * SpriteCodex::tileSize);
+	RectI gridRect = GetRect();
+
+	assert(screenPos.x >= gridRect.left && screenPos.x < gridRect.right &&
+		screenPos.y >= gridRect.top && screenPos.y < gridRect.bottom);
 
 	Vei2 gridPos = ScreenToGrid(screenPos);
 
@@ -143,9 +147,14 @@ int MemeField::CountNeighborMemes(const Vei2& gridPos)
 	return memeCount;
 }
 
-bool MemeField::Fucked()
+bool MemeField::Fucked() const
 {
 	return isFucked;
+}
+
+bool MemeField::GameWon() const
+{
+	return gameWon;
 }
 
 bool MemeField::Tile::HasMeme() const
