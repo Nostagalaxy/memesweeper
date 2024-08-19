@@ -26,6 +26,7 @@ class MemeField
 		void SpawnMeme();
 		void SetNeighborMemeCount(const int memeCount); //Set the number of neighboring memes for the tile.
 		void Draw(const Vei2& screenPos, const MemeField::State gameState, Graphics& gfx) const;
+		bool HasNoNeighborMemes() const;
 		void Reveal();
 		bool IsRevealed() const;
 		void ToggleFlag();
@@ -42,11 +43,12 @@ public:
 	void OnClickReveal(Vei2 screenPos);
 	void OnClickFlag(Vei2 screenPos);
 	RectI& GetRect() const;
-	int CountNeighborMemes(const Vei2& gridPos); //Takes a tile location and counts how many memes are neighboring that tile
 	bool Fucked() const;
 	bool GameWon() const;
 	State getState() const;
 private:
+	int CountNeighborMemes(const Vei2& gridPos);
+	void RevealTile(const Vei2& gridPos);
 	Tile& TileAt(const Vei2& gridPos);
 	const Tile& TileAt(const Vei2& gridPos) const;
 	Vei2& ScreenToGrid(Vei2& screenPos) const;

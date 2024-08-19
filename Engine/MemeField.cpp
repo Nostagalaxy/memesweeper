@@ -76,27 +76,12 @@ void MemeField::OnClickReveal(Vei2 screenPos)
 		screenPos.y >= gridRect.top && screenPos.y < gridRect.bottom);
 
 	Vei2 gridPos = ScreenToGrid(screenPos);
-
-	//Only reveal if the tile is not flagged and note revealed already
-	if (!TileAt(gridPos).IsRevealed() && !TileAt(gridPos).IsFlagged())
+	
+	RevealTile(gridPos);
+	
+	if (nonMemeTilesLeft <= 0)
 	{
-		TileAt(gridPos).Reveal();
-		
-		if (TileAt(gridPos).HasMeme())
-		{
-			gameState = State::Fucked;
-			gameOverLoc = gridPos;
-			gameOverSfx.Play();
-		}
-		else if (!TileAt(gridPos).HasMeme())
-		{
-			nonMemeTilesLeft--;
-
-			if (nonMemeTilesLeft <= 0)
-			{
-				gameState = State::Winrar;
-			}
-		}
+		gameState = State::Winrar;
 	}
 }
 
@@ -112,6 +97,42 @@ void MemeField::OnClickFlag(Vei2 screenPos)
 	if (!TileAt(gridPos).IsRevealed())
 	{
 		TileAt(gridPos).ToggleFlag();
+	}
+}
+
+void MemeField::RevealTile(const Vei2& gridPos)
+{
+	Tile& tile = TileAt(gridPos);
+	//Only reveal if the tile is not flagged and note revealed already
+	if (!tile.IsRevealed() && !tile.IsFlagged())
+	{
+		tile.Reveal();
+
+		if (tile.HasMeme())
+		{
+			gameState = State::Fucked;
+			gameOverLoc = gridPos;
+			gameOverSfx.Play();
+		}
+		else if (!tile.HasMeme())
+		{
+			nonMemeTilesLeft--;
+		}
+		if (tile.HasNoNeighborMemes())
+		{
+			const int xStart = std::max(gridPos.x - 1, 0);
+			const int yStart = std::max(gridPos.y - 1, 0);
+			const int xEnd = std::min(gridPos.x + 1, width - 1);
+			const int yEnd = std::min(gridPos.y + 1, height - 1);
+
+			for (Vei2 gridPos = { xStart, yStart }; gridPos.y <= yEnd; gridPos.y++)
+			{
+				for (gridPos.x = xStart; gridPos.x <= xEnd; gridPos.x++)
+				{	
+					RevealTile(gridPos);
+				}
+			}
+		}
 	}
 }
 
@@ -209,7 +230,7 @@ void MemeField::Tile::SetNeighborMemeCount(const int memeCount)
 
 void MemeField::Tile::Draw(const Vei2& screenPos, const MemeField::State gameState, Graphics& gfx) const
 {
-	if (gameState == MemeField::State::Play)
+	if (gameState == MemeField::State::Play || gameState == MemeField::State::Winrar)
 	{
 		switch (state)
 		{
@@ -292,6 +313,11 @@ void MemeField::Tile::Draw(const Vei2& screenPos, const MemeField::State gameSta
 		}
 		}
 	}
+}
+
+bool MemeField::Tile::HasNoNeighborMemes() const
+{
+	return nNeighborMemes == 0;
 }
 
 void MemeField::Tile::Reveal()
