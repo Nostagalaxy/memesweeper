@@ -66,6 +66,9 @@ void MemeField::Draw(Graphics& gfx) const
 	{
 		SpriteCodex::DrawWin(location, gfx);
 	}
+	
+	Vei2 moonPos = { 650, 100 };
+	SpriteCodex::DrawMoon( moonPos, gfx);
 }
 
 void MemeField::OnClickReveal(Vei2 screenPos)

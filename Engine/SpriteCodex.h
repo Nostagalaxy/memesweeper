@@ -28,4 +28,6 @@ public:
 	//Selects number tile based on nMemes
 	static void DrawNumberTile(const Vei2& screenPos, const int nMemes, Graphics& gfx);
 	static void DrawWin(const Vei2& pos, Graphics& gfx);
+
+	static void DrawMoon(const Vei2& pos, Graphics& gfx);
 };
